@@ -61,7 +61,7 @@
     value: "{{ item.value }}"
   loop:
     - { xpath: /configuration/folder, attribute: path, value: "{{ sync_dir }}" }
-    - { xpath: /configuration/gui/address, attribute: , value: "{{ gui_address }}" }
+    - { xpath: /configuration/gui/address, attribute:, value: "{{ gui_address }}" }
 
 - name: Add {{ ansible_user }} to {{ syncthing_group }} group
   user:
