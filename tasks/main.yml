@@ -1,0 +1,82 @@
+---
+- name: Add the release GPG key from syncthing
+  apt_key:
+    url: https://syncthing.net/release-key.gpg
+    keyring: /usr/share/keyrings/syncthing-archive-keyring.gpg
+    state: present
+
+- name: Add the repository in {{ channel }} channel to apt
+  apt_repository:
+    repo: deb [signed-by=/usr/share/keyrings/syncthing-archive-keyring.gpg] https://apt.syncthing.net/ syncthing {{ channel }}
+    state: present
+
+- name: Install syncthing via apt
+  apt:
+    name: syncthing
+    state: latest
+    update_cache: yes
+
+- name: Create {{ syncthing_group }} group
+  group:
+    name: "{{ syncthing_group }}"
+
+- name: Create {{ syncthing_user }} user
+  user:
+    name: "{{ syncthing_user }}"
+    group: "{{ syncthing_group }}"
+    home: "{{ syncthing_home }}"
+    create_home: yes
+
+- name: Create {{ sync_dir }}
+  file:
+    path: "{{ sync_dir }}"
+    state: directory
+    owner: "{{ syncthing_user }}"
+    group: "{{ syncthing_group }}"
+
+- name: Start syncthing service
+  systemd:
+    name: syncthing@{{ syncthing_user }}
+    state: started
+
+- name: Pause for 5 seconds to generate configs
+  pause:
+    seconds: 5
+
+- name: Stop syncthing service
+  systemd:
+    name: syncthing@{{ syncthing_user }}
+    state: stopped
+
+- name: Install lxml via pip
+  pip:
+    name: lxml
+    state: latest
+
+- name: Edit syncthing user config
+  community.general.xml:
+    path: "{{ syncthing_home }}/.config/syncthing/config.xml"
+    xpath: "{{ item.xpath }}"
+    attribute: "{{ item.attribute }}"
+    value: "{{ item.value }}"
+  loop:
+    - { xpath: /configuration/folder, attribute: path, value: "{{ sync_dir }}" }
+    - { xpath: /configuration/gui/address, attribute: , value: "{{ gui_address }}" }
+
+- name: Add {{ ansible_user }} to {{ syncthing_group }} group
+  user:
+    name: "{{ ansible_user }}"
+    group: "{{ syncthing_group }}"
+  when: ansible_user_access
+
+- name: Make sure {{ ansible_user }} has write access to {{ sync_dir }}
+  file:
+    path: "{{ sync_dir }}"
+    mode: g+rw
+  when: ansible_user_access
+
+- name: Start syncthing service
+  systemd:
+    name: syncthing@{{ syncthing_user }}
+    state: started
+    enabled: yes

@@ -1,0 +1,23 @@
+galaxy_info:
+  author: zoenglinghou
+  description: This role installs syncthing on Debian-based (as of now, Ubuntu and Debian) distros.
+
+  license: GPL-3.0-only
+
+  min_ansible_version: 2.1
+
+  platforms:
+  - name: Debian
+    versions:
+    - all
+  - name: Ubuntu
+    versions:
+    - all
+
+
+  galaxy_tags: [
+    syncthing
+    sync
+  ]
+
+dependencies: []

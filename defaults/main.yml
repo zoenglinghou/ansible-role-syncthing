@@ -1,0 +1,8 @@
+---
+channel: stable
+syncthing_user: syncthing
+syncthing_group: syncthing
+syncthing_home: /var/lib/syncthing
+sync_dir: /var/lib/syncthing/data
+ansible_user_access: yes
+gui_address: 127.0.0.1:8384
