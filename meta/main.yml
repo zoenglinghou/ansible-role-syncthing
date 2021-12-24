@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: syncthing
   author: zoenglinghou
   description: This role installs syncthing on Debian-based (as of now, Ubuntu and Debian) distros.
 
